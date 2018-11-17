@@ -12,12 +12,15 @@
 #
 # * 2018-11-17 - v0.0.0  - First Creation
 # * 2018-11-17 - v1.0.0  - First release
+# * 2018-11-17 - v1.1.0  - Added empty check
+# * 2018-11-17 - v1.2.0  - Added date format check
+# * 2018-11-17 - v1.3.0  - Added check for future date
 #
 # ##################################################
 # Initializing constants and variables
 # ##################################################
 # Setting constants
-version="v1.0.0"            # Sets version variable
+version="v1.3.0"            # Sets version variable
 lastEdited="2018-11-17"     # Sets last edited variable" $scriptNamePath
 # Declaring variables
 # Declare all variables to be used in the script 
@@ -57,10 +60,17 @@ fi
 # -- version
 # ##################################################
 if [ "$1" == "--version" ]; then
-    echo "archive ${version}, dated ${lastEdited} Initial release
+    echo "archive ${version}, dated ${lastEdited}
 (c) 2018 aetesaki"
     exit 0
 fi
+# ##################################################
+# no arguments gives short help
+# ##################################################
+if [ "$#" == "0" ]; then
+    shorthelp
+    exit 1
+fi 
 # ##################################################
 # Main section
 # ##################################################
@@ -70,6 +80,25 @@ if [ ! -d $destination ]; then
     echo "ERROR: $destination is not a directory."
     exit 1
 fi
+
+# get year, month and date from cutoffDate
+y=$( echo $cutofDate | cut -d"-" -f1 )
+m=$( echo $cutofDate | cut -d"-" -f2 )
+d=$( echo $cutofDate | cut -d"-" -f3 )
+# If cutoffDate is not a date
+if [ ! date -d "$y-$m-$d" &> /dev/null ]; then
+    # exit with error
+    echo "ERROR: $cutoffDate is not a date."
+    exit 1
+fi
+
+# if cutoffDate is in the future
+if [[ "$cutoffDate" > $( date -I ) ]]; then
+    # exit with error
+    echo "ERROR: $cutoffDate is a future date."
+    exit 1
+fi
+
 # For each file in directiory
 for file in * ; do
     # if file is not a directory
@@ -79,7 +108,8 @@ for file in * ; do
         # if lastModifiedDate older than cutoffDate
         if [[ "$lastModifiedDate" < "$cutoffDate" ]]; then
             # move file to destination
-            mv $file $destination
+            #echo "mv $file $destination" #DEBUG
+            mv $file $destination 
         fi
     fi
 done

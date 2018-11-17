@@ -15,12 +15,13 @@
 # * 2018-11-17 - v1.1.0  - Added empty check
 # * 2018-11-17 - v1.2.0  - Added date format check
 # * 2018-11-17 - v1.3.0  - Added check for future date
+# * 2018-11-17 - v1.3.1  - added help note on date format
 #
 # ##################################################
 # Initializing constants and variables
 # ##################################################
 # Setting constants
-version="v1.3.0"            # Sets version variable
+version="v1.3.1"            # Sets version variable
 lastEdited="2018-11-17"     # Sets last edited variable" $scriptNamePath
 # Declaring variables
 # Declare all variables to be used in the script 
@@ -49,7 +50,9 @@ if [ "$1" == "--help" ]; then
     echo "
     This script will move all files in current directory, which hasn't been 
     modified since before date to destination.
-    Destination must be a valid directory-"
+    Destination must be a valid directory.
+
+    NOTE: Date must be in international format: YYYY-MM-DD."
     # Write examples as required
     echo "
     archive 2016-1-1 FolderB

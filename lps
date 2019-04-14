@@ -1,0 +1,45 @@
+#!/bin/bash
+# list processes
+# (c) Aetesaki 2019
+# ##################################################
+# if no arguments
+if [ "$#" == "0" ]; then
+    # just list local processes
+    ps
+else
+    # else if first argument is aux
+    if [ "$1" == "aux" ]; then
+        # and the only argument
+        if [ "$#" == "1" ]; then
+            # list all processes owned by user and exit
+            ps aux
+            exit
+        else
+            # if there are more arguments discard the first
+            shift
+            # print the full header
+            ps aux | head -n 1 
+            # iterate each argument
+            for arg in "$@"
+            do
+                # selecting each argument from the list of processes
+                # and store them to a temporary file
+                ps aux | grep -i "$arg" >> /tmp/lps.tmp
+            done
+        fi
+    else
+        # if first argument is not aux
+        # then print the extended header        
+        ps x | head -n 1 
+        # iterate each argument
+        for arg in "$@"
+        do
+            # selecting each argument from the list of processes
+            # and store them to a temporary file
+            ps x | grep -i "$arg" >> /tmp/lps.tmp
+        done
+    fi
+    # display all unique entries sorted and delete the temporary file
+    cat /tmp/lps.tmp | sort | uniq
+    rm /tmp/lps.tmp
+fi

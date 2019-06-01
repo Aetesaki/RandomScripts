@@ -1,0 +1,123 @@
+#!/bin/bash
+
+# test-file: Evaluate the status of a file
+# based upon the exersize in the book
+# The Linux Command Line by William Shotts
+
+# check for empty arguments
+if [ "$#" == "0" ]; then
+	echo "No filename provided."
+	echo "Please provide at least one filename."
+	exit 1
+fi
+
+if [ "$1" == "--help" ]; then
+	cat <<- EOF
+		test-file filename [...]
+
+		Test-file will display the following information of each filename provided:
+
+		- symbolic link
+		- the file a symbolic link is linked to
+		- what type of path the symbolic link is
+		- regular file
+		- block device
+		- character device
+		- directory
+		- readable
+		- writable
+		- executable, if it's a regular file
+		- searchable, if it's a directory
+		- the owner of the file, if it's not accessible
+		
+		If the file does not exist it will say so
+		It will also tell you off, if you are childish...
+	EOF
+	exit
+fi
+
+childish () {
+	cat <<- EOF
+		What the heck are you thinking about?
+		I am a computer!
+		I don't have $1!
+		Don't be so childish!
+		Get real, moron!
+		I am a freaking COMPUTER!
+	EOF
+}
+
+for x in "$@"
+do
+	ax=""
+	file=$x
+
+	echo "Checking for $file..."
+
+	# test filetype
+	if [ -L "$file" ]; then
+		echo "$file is a symbolic link."
+		echo "$file is linked to $(readlink $file)"
+		file=$(readlink $file)
+		if [ "${file:0:1}" != "/" ]; then
+			echo "The link $file is a relative path."
+			file=$(dirname $x)$file
+		else
+			echo "The link $file is a global path."
+		fi
+	fi
+	if [ -e "$file" ]; then
+		if [ -f "$file" ]; then
+			echo "$file is a regular file."
+		fi
+		if [ -b "$file" ]; then
+			echo "$file is a block device."
+		fi
+		if [ -c "$file" ]; then
+			echo "$file is a character device."
+		fi
+		if [ -d "$file" ]; then
+			echo "$file is a directory."
+		fi
+		if [ -r "$file" ]; then
+			echo "$file is readable."
+		else
+			ax=${ax}r
+		fi
+		if [ -w "$file" ]; then
+			echo "$file is writable."
+		else
+			ax=${ax}w
+		fi
+		if [ -x "$file" ]; then
+			if [ -f "$file" ]; then
+				echo "$file is executable."
+			elif [ -d "$file" ]; then
+				echo "$file is searchable."
+			fi
+		else
+			ax=${ax}x
+		fi
+		if [ "$ax" == "rwx" ]; then
+			echo "$file is not accessible."
+			echo "$file is owned by $(stat --format '%U' $file)"
+		fi
+	else
+		if [ -L "$file" ]; then
+			echo "$(readlink $file) doesn't exist."
+		else
+			if [ "$(basename $file)" == "sex" ]; then
+				childish sex
+			elif [ "$(basename $file)" == "dick" ]; then
+				childish "a penis"
+			elif [ "$(basename $file)" == "pussy" ]; then
+				childish "a vagina"
+			else
+				echo "$file doesn't exist."
+			fi
+		fi
+	fi
+	echo
+done
+
+exit

@@ -1,0 +1,90 @@
+#!/bin/bash
+# This script's framework was created using makescript 
+# version v1.0.2, dated 2019-07-18
+# Makescript and its accompanying scripts are copyrighted
+# by Aetesaki (c) 2018
+# 
+# degf2degc (c) 2019 aetesaki
+#
+# ##################################################
+# HISTORY:
+# ##################################################
+#
+# * 2019-07-19 - v0.0.0  - First Creation
+#
+# ##################################################
+# Initializing constants and variables
+# ##################################################
+# Setting constants
+version="v0.0.0"            # Sets version variable
+lastEdited="2019-07-19"     # Sets last edited variable" $scriptNamePath
+[ ! -t 0 ] && pipe=$(cat)   # if stdin is open dump stdin to $pipe
+# Declaring variables
+declare fahrenheit celcius	# temperature variables
+# Declare all variables to be used in the script 
+# ##################################################
+# short help function
+# ##################################################
+shorthelp() {
+    # Edit as required
+    cat << EOF
+Usage: degf2degc [fahrenheit]
+       degf2degc --help
+       degf2degc --version"
+EOF
+}
+# ##################################################
+# no arguments gives short help
+# ##################################################
+if [ "$#" == "0" ]; then
+	# check if $pipe is empty
+	if [ -z "$pipe" ]; then
+		# display shorthelp and exit
+		shorthelp
+		exit 1
+	else
+		# else set arguments to $pipe
+		set -- "$pipe"
+	fi
+fi 
+# ##################################################
+# -- help
+# ##################################################
+if [ "$1" == "--help" ]; then
+    shorthelp
+    # Write options and explanations
+    cat << EOF
+   --help                 Displays this text and exit.
+   --version              Displays the version of the script and exit.
+EOF
+    # Write information on arguments afterwards
+    # Write examples as required
+    exit 0
+fi 
+# ##################################################
+# -- version
+# ##################################################
+if [ "$1" == "--version" ]; then
+    cat << EOF
+degf2degc ${version}, dated ${lastEdited}
+(c) 2019 aetesaki
+EOF
+    exit 0
+fi
+# ##################################################
+# Main section
+# ##################################################
+# Write your script here
+# copy first argument to $fahrenheit
+fahrenheit=$1
+# Check for valid argument
+if ! [[ $fahrenheit =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]]; then
+	echo "Fahrenheit temperature measurement is not a number" >&2
+	exit 1
+fi
+
+# convert fahrenheit to celcius
+celsius=$(awk "BEGIN {printf \"%.2f\n\", ($fahrenheit-32) * (5/9)}")
+
+# echo the converted temperature
+echo $celsius
